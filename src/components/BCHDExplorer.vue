@@ -90,7 +90,15 @@ export default {
     };
   },
   mounted() {
-    this.searchBCHD(this.$route.params.txId)
+    const params = this.$route.params
+    if (params.address) {
+      this.searchBCHD(params.address)
+    } else if (params.blockHash) {
+      this.searchBCHD(params.blockHash)
+    } else if (params.txId) {
+      this.searchBCHD(params.txId)
+    }
+
   },
   methods: {
     search: async function() {
