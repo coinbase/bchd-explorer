@@ -114,16 +114,19 @@ export default {
       if (bchaddr.isValidAddress(input)) {
         var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
+        this.$router.push({path: input})
         return;
       }
 
       var blockData = await this.populateBlockData(input);
       if (blockData === true) {
+        this.$router.push({path: input})
         return;
       }
 
       var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
+        this.$router.push({path: input})
         return;
       }
 
