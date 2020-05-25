@@ -16,9 +16,22 @@
 
 import Vue from 'vue';
 import App from './App.vue';
+import VueRouter from 'vue-router';
+import BCHDExplorer from './components/BCHDExplorer.vue';
 
 Vue.config.productionTip = false;
 
+Vue.use(VueRouter)
+const router = new VueRouter({
+  mode: 'history',
+  routes: [
+    { path: '/address/:address', component: BCHDExplorer },
+    { path: '/block/:blockHash', component: BCHDExplorer },
+    { path: '/tx/:txId', component: BCHDExplorer },
+  ]
+})
+
 new Vue({
+  router,
   render: h => h(App),
 }).$mount('#app');

@@ -30,7 +30,7 @@
               v-model="input"
               :autofocus="'autofocus'" autocomplete="off"
               placeholder="Address, transaction or block hash/height"
-              @keyup.enter="searchBCHD">
+              @keyup.enter="search">
             <span class="icon is-small is-left">
               <i class="fas fa-search"></i>
             </span>
@@ -89,26 +89,32 @@ export default {
       getInfoBar: true,
     };
   },
+  mounted() {
+    this.searchBCHD(this.$route.params.txId)
+  },
   methods: {
-    searchBCHD: async function () {
+    search: async function() {
+      this.searchBCHD(this.input)
+    },
+    searchBCHD: async function (input) {
       this.resetState();
 
-      if (this.input == "") {
+      if (input == "") {
         return;
       }
 
-      if (bchaddr.isValidAddress(this.input)) {
-        var addr = bchaddr.toCashAddress(this.input);
+      if (bchaddr.isValidAddress(input)) {
+        var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
         return;
       }
 
-      var blockData = await this.populateBlockData();
+      var blockData = await this.populateBlockData(input);
       if (blockData === true) {
         return;
       }
 
-      var transactionData = await this.populateTransactionData();
+      var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
         return;
       }
@@ -134,10 +140,10 @@ export default {
         this.result = "Address not found.";
       }
     },
-    populateBlockData: async function() {
+    populateBlockData: async function(input) {
       var blockFinder = 'hash';
 
-      if (this.input >= 0 && this.input < 10000000) {
+      if (input >= 0 && input < 10000000) {
         blockFinder = 'height';
       }
 
@@ -145,9 +151,9 @@ export default {
         var blockResult = "";
 
         if (blockFinder === 'height') {
-          blockResult = await this.grpc.getBlockInfo({index: this.input});
+          blockResult = await this.grpc.getBlockInfo({index: input});
         } else {
-          blockResult = await this.grpc.getBlockInfo({hash: this.input, reversedHashOrder: true});
+          blockResult = await this.grpc.getBlockInfo({hash: input, reversedHashOrder: true});
         }
 
         var blockInfo = blockResult.getInfo();
@@ -177,10 +183,10 @@ export default {
         return false;
       }
     },
-    populateTransactionData: async function() {
+    populateTransactionData: async function(input) {
       try {
-        var txResult = await this.grpc.getTransaction({hash: this.input, reversedHashOrder: true});
-        this.transaction = this.input;
+        var txResult = await this.grpc.getTransaction({hash: input, reversedHashOrder: true});
+        this.transaction = input;
         var tx = txResult.getTransaction();
         this.transactionData['version'] = tx.getVersion();
         this.transactionData['lock_time'] = tx.getLockTime();
