@@ -98,7 +98,13 @@ export default {
     } else if (params.txId) {
       this.searchBCHD(params.txId)
     }
-
+  },
+  watch: {
+    $route(to) {
+      this.input = ""
+      const input = to.params.address || to.params.blockHash || to.params.txId
+      this.searchBCHD(input)
+    }
   },
   methods: {
     search: async function() {
@@ -114,19 +120,19 @@ export default {
       if (bchaddr.isValidAddress(input)) {
         var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
-        this.$router.push({path: input})
+        this.$router.push({name: 'address', params: {address: input}})
         return;
       }
 
       var blockData = await this.populateBlockData(input);
       if (blockData === true) {
-        this.$router.push({path: input})
+        this.$router.push({name: 'block', params: {blockHash: input}})
         return;
       }
 
       var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
-        this.$router.push({path: input})
+        this.$router.push({name: 'tx', params: {txId: input}})
         return;
       }
 
