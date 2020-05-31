@@ -26,9 +26,12 @@ const router = new VueRouter({
   mode: 'history',
   routes: [
     {name: 'home', path: '/', component: BCHDExplorer},
-    {name: 'address', path: '/address/:address', component: BCHDExplorer},
-    {name: 'block', path: '/block/:blockHash', component: BCHDExplorer},
-    {name: 'tx', path: '/tx/:txId', component: BCHDExplorer},
+    {name: 'mainnet/address', path: '/mainnet/address/:address', component: BCHDExplorer},
+    {name: 'testnet/address', path: '/testnet/address/:address', component: BCHDExplorer},
+    {name: 'mainnet/block', path: '/mainnet/block/:blockHash', component: BCHDExplorer},
+    {name: 'testnet/block', path: '/testnet/block/:blockHash', component: BCHDExplorer},
+    {name: 'mainnet/tx', path: '/mainnet/tx/:txId', component: BCHDExplorer},
+    {name: 'testnet/tx', path: '/testnet/tx/:txId', component: BCHDExplorer},
   ]
 })
 

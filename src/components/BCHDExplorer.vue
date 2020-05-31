@@ -121,23 +121,26 @@ export default {
       if (bchaddr.isValidAddress(input)) {
         var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
-        this.$router.push({name: 'address', params: {address: input}}).catch(() => {})
+        this.$router.push({name: `${this.determineNetwork()}/address`, params: {address: input}}).catch(() => {})
         return;
       }
 
       var blockData = await this.populateBlockData(input);
       if (blockData === true) {
-        this.$router.push({name: 'block', params: {blockHash: input}}).catch(() => {})
+        this.$router.push({name: `${this.determineNetwork()}/block`, params: {blockHash: input}}).catch(() => {})
         return;
       }
 
       var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
-        this.$router.push({name: 'tx', params: {txId: input}}).catch(() => {})
+        this.$router.push({name: `${this.determineNetwork()}/tx`, params: {txId: input}}).catch(() => {})
         return;
       }
 
       this.result = 'No address, transaction or block hash/height found.';
+    },
+    determineNetwork: function() {
+      return this.testnet ? 'testnet' : 'mainnet'
     },
     populateAddressData: async function(addr) {
       try {
