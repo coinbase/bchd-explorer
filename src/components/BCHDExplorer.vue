@@ -103,6 +103,10 @@ export default {
     $route(to) {
       this.input = ""
       const input = to.params.address || to.params.blockHash || to.params.txId
+
+      this.testnet = !!this.$route.path.match(/^\/testnet/)
+      this.updateNetwork()
+
       this.searchBCHD(input)
     }
   },
