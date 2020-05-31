@@ -25,6 +25,7 @@ Vue.use(VueRouter)
 const router = new VueRouter({
   mode: 'history',
   routes: [
+    {name: 'home', path: '/', component: BCHDExplorer},
     {name: 'address', path: '/address/:address', component: BCHDExplorer},
     {name: 'block', path: '/block/:blockHash', component: BCHDExplorer},
     {name: 'tx', path: '/tx/:txId', component: BCHDExplorer},

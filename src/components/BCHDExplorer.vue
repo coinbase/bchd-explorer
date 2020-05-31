@@ -114,25 +114,26 @@ export default {
       this.resetState();
 
       if (input == "") {
+        this.$router.push({name: 'home'}).catch(() => {})
         return;
       }
 
       if (bchaddr.isValidAddress(input)) {
         var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
-        this.$router.push({name: 'address', params: {address: input}})
+        this.$router.push({name: 'address', params: {address: input}}).catch(() => {})
         return;
       }
 
       var blockData = await this.populateBlockData(input);
       if (blockData === true) {
-        this.$router.push({name: 'block', params: {blockHash: input}})
+        this.$router.push({name: 'block', params: {blockHash: input}}).catch(() => {})
         return;
       }
 
       var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
-        this.$router.push({name: 'tx', params: {txId: input}})
+        this.$router.push({name: 'tx', params: {txId: input}}).catch(() => {})
         return;
       }
 
