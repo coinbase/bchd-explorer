@@ -114,7 +114,7 @@ export default {
     search: async function() {
       this.searchBCHD(this.input)
     },
-    searchBCHD: async function (input) {
+    searchBCHD: async function(input) {
       this.resetState();
 
       if (input == "") {
