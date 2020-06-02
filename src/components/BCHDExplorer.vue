@@ -66,6 +66,9 @@ import BCHTransaction from './BCHTransaction.vue';
 import sb from 'satoshi-bitcoin';
 import prettyBytes from 'pretty-bytes';
 
+const TESTNET = 'testnet'
+const MAINNET = 'mainnet'
+
 export default {
   name: 'explorer',
   components: {
@@ -90,23 +93,20 @@ export default {
     };
   },
   mounted() {
+    this.testnet = this.$route.params.network === TESTNET
+    this.updateNetwork()
+
     const params = this.$route.params
-    if (params.address) {
-      this.searchBCHD(params.address)
-    } else if (params.blockHash) {
-      this.searchBCHD(params.blockHash)
-    } else if (params.txId) {
-      this.searchBCHD(params.txId)
-    }
+    const input = params.address || params.blockHash || params.txId
+    this.searchBCHD(input)
   },
   watch: {
     $route(to) {
-      this.input = ""
-      const input = to.params.address || to.params.blockHash || to.params.txId
-
-      this.testnet = !!this.$route.path.match(/^\/testnet/)
+      this.testnet = to.params.network === TESTNET
       this.updateNetwork()
 
+      this.input = ""
+      const input = to.params.address || to.params.blockHash || to.params.txId
       this.searchBCHD(input)
     }
   },
@@ -125,26 +125,44 @@ export default {
       if (bchaddr.isValidAddress(input)) {
         var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
-        this.$router.push({name: `${this.determineNetwork()}/address`, params: {address: input}}).catch(() => {})
+        this.$router.push({
+          name: 'address',
+          params: {
+            network: this.determineNetwork(),
+            address: input
+          }
+        }).catch(() => {})
         return;
       }
 
       var blockData = await this.populateBlockData(input);
       if (blockData === true) {
-        this.$router.push({name: `${this.determineNetwork()}/block`, params: {blockHash: input}}).catch(() => {})
+        this.$router.push({
+          name: 'block',
+          params: {
+            network: this.determineNetwork(),
+            blockHash: input
+          }
+        }).catch(() => {})
         return;
       }
 
       var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
-        this.$router.push({name: `${this.determineNetwork()}/tx`, params: {txId: input}}).catch(() => {})
+        this.$router.push({
+          name: 'tx',
+          params: {
+            network: this.determineNetwork(),
+            txId: input
+          }
+        }).catch(() => {})
         return;
       }
 
       this.result = 'No address, transaction or block hash/height found.';
     },
     determineNetwork: function() {
-      return this.testnet ? 'testnet' : 'mainnet'
+      return this.testnet ? TESTNET : MAINNET
     },
     populateAddressData: async function(addr) {
       try {
