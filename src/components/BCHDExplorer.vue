@@ -30,7 +30,7 @@
               v-model="input"
               :autofocus="'autofocus'" autocomplete="off"
               placeholder="Address, transaction or block hash/height"
-              @keyup.enter="searchBCHD">
+              @keyup.enter="search">
             <span class="icon is-small is-left">
               <i class="fas fa-search"></i>
             </span>
@@ -66,6 +66,9 @@ import BCHTransaction from './BCHTransaction.vue';
 import sb from 'satoshi-bitcoin';
 import prettyBytes from 'pretty-bytes';
 
+const TESTNET = 'testnet'
+const MAINNET = 'mainnet'
+
 export default {
   name: 'explorer',
   components: {
@@ -89,31 +92,77 @@ export default {
       getInfoBar: true,
     };
   },
+  mounted() {
+    this.testnet = this.$route.params.network === TESTNET
+    this.updateNetwork()
+
+    const params = this.$route.params
+    const input = params.address || params.blockHash || params.txId
+    this.searchBCHD(input)
+  },
+  watch: {
+    $route(to) {
+      this.testnet = to.params.network === TESTNET
+      this.updateNetwork()
+
+      this.input = ""
+      const input = to.params.address || to.params.blockHash || to.params.txId
+      this.searchBCHD(input)
+    }
+  },
   methods: {
-    searchBCHD: async function () {
+    search: async function() {
+      this.searchBCHD(this.input)
+    },
+    searchBCHD: async function (input) {
       this.resetState();
 
-      if (this.input == "") {
+      if (input == "") {
+        this.$router.push({name: 'home'}).catch(() => {})
         return;
       }
 
-      if (bchaddr.isValidAddress(this.input)) {
-        var addr = bchaddr.toCashAddress(this.input);
+      if (bchaddr.isValidAddress(input)) {
+        var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
+        this.$router.push({
+          name: 'address',
+          params: {
+            network: this.determineNetwork(),
+            address: input
+          }
+        }).catch(() => {})
         return;
       }
 
-      var blockData = await this.populateBlockData();
+      var blockData = await this.populateBlockData(input);
       if (blockData === true) {
+        this.$router.push({
+          name: 'block',
+          params: {
+            network: this.determineNetwork(),
+            blockHash: input
+          }
+        }).catch(() => {})
         return;
       }
 
-      var transactionData = await this.populateTransactionData();
+      var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
+        this.$router.push({
+          name: 'tx',
+          params: {
+            network: this.determineNetwork(),
+            txId: input
+          }
+        }).catch(() => {})
         return;
       }
 
       this.result = 'No address, transaction or block hash/height found.';
+    },
+    determineNetwork: function() {
+      return this.testnet ? TESTNET : MAINNET
     },
     populateAddressData: async function(addr) {
       try {
@@ -134,10 +183,10 @@ export default {
         this.result = "Address not found.";
       }
     },
-    populateBlockData: async function() {
+    populateBlockData: async function(input) {
       var blockFinder = 'hash';
 
-      if (this.input >= 0 && this.input < 10000000) {
+      if (input >= 0 && input < 10000000) {
         blockFinder = 'height';
       }
 
@@ -145,9 +194,9 @@ export default {
         var blockResult = "";
 
         if (blockFinder === 'height') {
-          blockResult = await this.grpc.getBlockInfo({index: this.input});
+          blockResult = await this.grpc.getBlockInfo({index: input});
         } else {
-          blockResult = await this.grpc.getBlockInfo({hash: this.input, reversedHashOrder: true});
+          blockResult = await this.grpc.getBlockInfo({hash: input, reversedHashOrder: true});
         }
 
         var blockInfo = blockResult.getInfo();
@@ -177,10 +226,10 @@ export default {
         return false;
       }
     },
-    populateTransactionData: async function() {
+    populateTransactionData: async function(input) {
       try {
-        var txResult = await this.grpc.getTransaction({hash: this.input, reversedHashOrder: true});
-        this.transaction = this.input;
+        var txResult = await this.grpc.getTransaction({hash: input, reversedHashOrder: true});
+        this.transaction = input;
         var tx = txResult.getTransaction();
         this.transactionData['version'] = tx.getVersion();
         this.transactionData['lock_time'] = tx.getLockTime();

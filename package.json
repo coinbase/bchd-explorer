@@ -17,7 +17,8 @@
     "jest": "^25.5.4",
     "pretty-bytes": "^5.3.0",
     "satoshi-bitcoin": "^1.0.4",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-router": "^3.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.3.1",
