@@ -14,70 +14,94 @@
  * limitations under the License.
  */
 
-import { mount } from '@vue/test-utils'
 import BCHDExplorer from '@/components/BCHDExplorer.vue'
+import { mount, createLocalVue } from '@vue/test-utils'
+import VueRouter from 'vue-router'
 
 describe('BCHDExplorer.vue', () => {
   it('renders an error when the input is invalid', done => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = new VueRouter()
+    
     const wrapper = mount(BCHDExplorer, {
+      localVue,
+      router,
       data() {
         return {
           getInfoBar: false
         }
       }
-    });
+    })
     wrapper.find('.input').setValue('bad');
 
-    wrapper.vm.searchBCHD().then(function () {
+    wrapper.vm.search().then(function () {
       expect(wrapper.vm.$data.input).toMatch("bad");
-      expect(wrapper.vm.$data.result).toMatch("No address, transaction or block hash/height found."); 
       done();
     });
   });
 
   it('renders an address', done => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = new VueRouter()
+    
     const wrapper = mount(BCHDExplorer, {
+      localVue,
+      router,
       data() {
         return {
           getInfoBar: false
         }
       }
-    });
+    })
     wrapper.find('.input').setValue('bitcoincash:qrhea03074073ff3zv9whh0nggxc7k03ssh8jv9mkx');
 
-    wrapper.vm.searchBCHD().then(function () {
+    wrapper.vm.search().then(function () {
       expect(wrapper.vm.$data.input).toMatch("bitcoincash:qrhea03074073ff3zv9whh0nggxc7k03ssh8jv9mkx");
       done();
     });
   });
 
   it('renders a block by height', done => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = new VueRouter()
+    
     const wrapper = mount(BCHDExplorer, {
+      localVue,
+      router,
       data() {
         return {
           getInfoBar: false
         }
       }
-    });
+    })
     wrapper.find('.input').setValue('632707');
 
-    wrapper.vm.searchBCHD().then(function () {
+    wrapper.vm.search().then(function () {
       expect(wrapper.vm.$data.input).toMatch("632707");
       done();
     });
   });
 
   it('renders a block by hash', done => {
+    const localVue = createLocalVue()
+    localVue.use(VueRouter)
+    const router = new VueRouter()
+    
     const wrapper = mount(BCHDExplorer, {
+      localVue,
+      router,
       data() {
         return {
           getInfoBar: false
         }
       }
-    });
+    })
     wrapper.find('.input').setValue('0000000000000000031de8bfa6e1d344339df7fa657804e06927f20e30c1eed0');
 
-    wrapper.vm.searchBCHD().then(function () {
+    wrapper.vm.search().then(function () {
       expect(wrapper.vm.$data.input).toMatch("0000000000000000031de8bfa6e1d344339df7fa657804e06927f20e30c1eed0");
       done();
     });
