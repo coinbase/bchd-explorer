@@ -98,7 +98,10 @@ export default {
 
     const params = this.$route.params
     const input = params.address || params.blockHash || params.txId
-    this.searchBCHD(input)
+
+    if (input != undefined) {
+      this.searchBCHD(input)
+    }
   },
   watch: {
     $route(to) {
@@ -107,7 +110,10 @@ export default {
 
       this.input = ""
       const input = to.params.address || to.params.blockHash || to.params.txId
-      this.searchBCHD(input)
+
+      if (input != undefined) {
+        this.searchBCHD(input)
+      }
     }
   },
   methods: {

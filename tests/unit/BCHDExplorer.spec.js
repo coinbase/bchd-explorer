@@ -23,7 +23,7 @@ describe('BCHDExplorer.vue', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = new VueRouter()
-    
+
     const wrapper = mount(BCHDExplorer, {
       localVue,
       router,
@@ -45,7 +45,7 @@ describe('BCHDExplorer.vue', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = new VueRouter()
-    
+
     const wrapper = mount(BCHDExplorer, {
       localVue,
       router,
@@ -67,7 +67,7 @@ describe('BCHDExplorer.vue', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = new VueRouter()
-    
+
     const wrapper = mount(BCHDExplorer, {
       localVue,
       router,
@@ -89,7 +89,7 @@ describe('BCHDExplorer.vue', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
     const router = new VueRouter()
-    
+
     const wrapper = mount(BCHDExplorer, {
       localVue,
       router,
