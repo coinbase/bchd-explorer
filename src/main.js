@@ -25,10 +25,10 @@ Vue.use(VueRouter)
 const router = new VueRouter({
   mode: 'history',
   routes: [
-    {name: 'home', path: '/', component: BCHDExplorer},
-    {name: 'address', path: '/:network/address/:address', component: BCHDExplorer},
-    {name: 'block', path: '/:network/block/:blockHash', component: BCHDExplorer},
-    {name: 'tx', path: '/:network/tx/:txId', component: BCHDExplorer},
+    { name: 'home', path: '/', component: BCHDExplorer },
+    { name: 'address', path: '/:network/address/:address', component: BCHDExplorer },
+    { name: 'block', path: '/:network/block/:blockHash', component: BCHDExplorer },
+    { name: 'tx', path: '/:network/tx/:txId', component: BCHDExplorer },
   ]
 })
 

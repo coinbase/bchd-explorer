@@ -22,40 +22,52 @@
       </thead>
       <tbody>
         <tr>
-          <td>Height</td><td>{{blockData['height']}}</td>
+          <td>Height</td>
+          <td>{{blockData['height']}}</td>
         </tr>
         <tr>
-          <td>Version</td><td>{{blockData['version']}}</td>
+          <td>Version</td>
+          <td>{{blockData['version']}}</td>
         </tr>
         <tr>
-          <td>Previous Block</td><td>{{blockData['previous_block']}}</td>
+          <td>Previous Block</td>
+          <td>{{blockData['previous_block']}}</td>
         </tr>
         <tr>
-          <td>Merkle Root</td><td>{{blockData['merkle_root']}}</td>
+          <td>Merkle Root</td>
+          <td>{{blockData['merkle_root']}}</td>
         </tr>
         <tr>
-          <td>Timestamp</td><td>{{blockData['timestamp']}}</td>
+          <td>Timestamp</td>
+          <td>{{blockData['timestamp']}}</td>
         </tr>
         <tr>
-          <td>Bits</td><td>{{blockData['bits']}}</td>
+          <td>Bits</td>
+          <td>{{blockData['bits']}}</td>
         </tr>
         <tr>
-          <td>Nonce</td><td>{{blockData['nonce']}}</td>
+          <td>Nonce</td>
+          <td>{{blockData['nonce']}}</td>
         </tr>
         <tr>
-          <td>Confirmations</td><td>{{blockData['confirmations']}}</td>
+          <td>Confirmations</td>
+          <td>{{blockData['confirmations']}}</td>
         </tr>
         <tr>
-          <td>Difficulty</td><td>{{blockData['difficulty']}}</td>
+          <td>Difficulty</td>
+          <td>{{blockData['difficulty']}}</td>
         </tr>
         <tr>
-          <td>Next Block Hash</td><td>{{blockData['next_block_hash']}}</td>
+          <td>Next Block Hash</td>
+          <td>{{blockData['next_block_hash']}}</td>
         </tr>
         <tr>
-          <td>Size</td><td>{{blockData['size']}}</td>
+          <td>Size</td>
+          <td>{{blockData['size']}}</td>
         </tr>
         <tr>
-          <td>Median Time</td><td>{{blockData['median_time']}}</td>
+          <td>Median Time</td>
+          <td>{{blockData['median_time']}}</td>
         </tr>
       </tbody>
     </table>
@@ -64,7 +76,7 @@
 
 <script>
 export default {
-  name: 'bchblock',
-  props: ['block', 'blockData'],
-}
+  name: "bchblock",
+  props: ["block", "blockData"]
+};
 </script>
