@@ -22,22 +22,28 @@
       </thead>
       <tbody>
         <tr>
-          <td>Balance</td><td>{{addressData['balance']}} BCH</td>
+          <td>Balance</td>
+          <td>{{addressData['balance']}} BCH</td>
         </tr>
         <tr>
-          <td>Satoshis</td><td>{{addressData['satoshis']}}</td>
+          <td>Satoshis</td>
+          <td>{{addressData['satoshis']}}</td>
         </tr>
         <tr>
-          <td>Legacy Address</td><td>{{addressData['legacy']}}</td>
+          <td>Legacy Address</td>
+          <td>{{addressData['legacy']}}</td>
         </tr>
         <tr>
-          <td>Confirmed Transactions</td><td>{{addressData['confirmed_transactions']}}</td>
+          <td>Confirmed Transactions</td>
+          <td>{{addressData['confirmed_transactions']}}</td>
         </tr>
         <tr>
-          <td>Unconfirmed Transactions</td><td>{{addressData['unconfirmed_transactions']}}</td>
+          <td>Unconfirmed Transactions</td>
+          <td>{{addressData['unconfirmed_transactions']}}</td>
         </tr>
         <tr>
-          <td>UTXOs</td><td>{{addressData['utxos']}}</td>
+          <td>UTXOs</td>
+          <td>{{addressData['utxos']}}</td>
         </tr>
       </tbody>
     </table>
@@ -46,7 +52,7 @@
 
 <script>
 export default {
-  name: 'bchaddress',
-  props: ['address', 'addressData'],
-}
+  name: "bchaddress",
+  props: ["address", "addressData"]
+};
 </script>

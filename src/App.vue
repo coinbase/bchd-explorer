@@ -21,13 +21,13 @@
 </template>
 
 <script>
-import BCHDExplorer from './components/BCHDExplorer.vue'
+import BCHDExplorer from "./components/BCHDExplorer.vue";
 
 export default {
-  name: 'app',
+  name: "app",
   components: {
     BCHDExplorer
-  },
-}
+  }
+};
 </script>
 

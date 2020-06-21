@@ -22,74 +22,104 @@
       </thead>
       <tbody>
         <tr>
-          <td>Version</td><td>{{transactionData['version']}}</td>
+          <td>Version</td>
+          <td>{{transactionData['version']}}</td>
         </tr>
         <tr>
-          <td>Lock Time</td><td>{{transactionData['lock_time']}}</td>
+          <td>Lock Time</td>
+          <td>{{transactionData['lock_time']}}</td>
         </tr>
         <tr>
-          <td>Size</td><td>{{transactionData['size']}}</td>
+          <td>Size</td>
+          <td>{{transactionData['size']}}</td>
         </tr>
         <tr>
-          <td>Timestamp</td><td>{{transactionData['timestamp']}}</td>
+          <td>Timestamp</td>
+          <td>{{transactionData['timestamp']}}</td>
         </tr>
         <tr>
-          <td>Confirmations</td><td>{{transactionData['confirmations']}}</td>
+          <td>Confirmations</td>
+          <td>{{transactionData['confirmations']}}</td>
         </tr>
         <tr>
-          <td>Block Height</td><td>{{transactionData['block_height']}}</td>
+          <td>Block Height</td>
+          <td>{{transactionData['block_height']}}</td>
         </tr>
         <tr>
-          <td>Block Hash</td><td>{{transactionData['block_hash']}}</td>
+          <td>Block Hash</td>
+          <td>{{transactionData['block_hash']}}</td>
         </tr>
       </tbody>
     </table>
     <h2>Inputs</h2>
-    <table class="table is-bordered is-striped" align="center" v-for="item in transactionData['inputs']" v-bind:key="item.id">
+    <table
+      class="table is-bordered is-striped"
+      align="center"
+      v-for="item in transactionData['inputs']"
+      v-bind:key="item.id"
+    >
       <tbody>
         <tr>
-          <td>Index</td><td>{{item.getIndex()}}</td>
+          <td>Index</td>
+          <td>{{item.getIndex()}}</td>
         </tr>
         <tr>
-          <td>Outpoint Hash</td><td>{{convertHash(item.getOutpoint().getHash())}}</td>
+          <td>Outpoint Hash</td>
+          <td>{{convertHash(item.getOutpoint().getHash())}}</td>
         </tr>
         <tr>
-          <td>Outpoint Index</td><td>{{item.getOutpoint().getIndex()}}</td>
+          <td>Outpoint Index</td>
+          <td>{{item.getOutpoint().getIndex()}}</td>
         </tr>
         <tr>
-          <td>Signature Script</td><td>{{viewScript(item.getSignatureScript_asU8())}}</td>
+          <td>Signature Script</td>
+          <td>{{viewScript(item.getSignatureScript_asU8())}}</td>
         </tr>
         <tr>
-          <td>Sequence</td><td>{{item.getSequence()}}</td>
+          <td>Sequence</td>
+          <td>{{item.getSequence()}}</td>
         </tr>
         <tr>
-          <td>Value</td><td>{{item.getValue()}}</td>
+          <td>Value</td>
+          <td>{{item.getValue()}}</td>
         </tr>
         <tr>
-          <td>Previous Script</td><td>{{viewScript(item.getPreviousScript_asU8())}}</td>
+          <td>Previous Script</td>
+          <td>{{viewScript(item.getPreviousScript_asU8())}}</td>
         </tr>
         <tr>
-          <td>Address</td><td>{{item.getAddress()}}</td>
+          <td>Address</td>
+          <td>{{item.getAddress()}}</td>
         </tr>
       </tbody>
     </table>
     <h2>Outputs</h2>
-    <table class="table is-bordered is-striped" align="center" v-for="item in transactionData['outputs']" v-bind:key="item.id">
+    <table
+      class="table is-bordered is-striped"
+      align="center"
+      v-for="item in transactionData['outputs']"
+      v-bind:key="item.id"
+    >
       <tbody>
         <tr>
-          <td>Index</td><td>{{item.getIndex()}}</td>
+          <td>Index</td>
+          <td>{{item.getIndex()}}</td>
         </tr>
         <tr>
-          <td>Value</td><td>{{item.getValue()}}</td>
+          <td>Value</td>
+          <td>{{item.getValue()}}</td>
         </tr>
         <tr>
-          <td>Pubkey Script</td><td>{{viewScript(item.getPubkeyScript_asU8())}}</td>
+          <td>Pubkey Script</td>
+          <td>{{viewScript(item.getPubkeyScript_asU8())}}</td>
         </tr>
         <tr>
-          <td>Address</td><td>{{item.getAddress()}}</td>
+          <td>Address</td>
+          <td>{{item.getAddress()}}</td>
         </tr>
         <tr>
-          <td>Script Class</td><td>{{item.getScriptClass()}}</td>
+          <td>Script Class</td>
+          <td>{{item.getScriptClass()}}</td>
         </tr>
       </tbody>
     </table>
@@ -98,17 +128,19 @@
 
 <script>
 export default {
-  name: 'bchtransaction',
-  props: ['transaction', 'transactionData'],
+  name: "bchtransaction",
+  props: ["transaction", "transactionData"],
   methods: {
-    convertHash: function (bytes) {
+    convertHash: function(bytes) {
       return Array.from(bytes, function(byte) {
-        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-      }).reverse().join('');
+        return ("0" + (byte & 0xff).toString(16)).slice(-2);
+      })
+        .reverse()
+        .join("");
     },
     viewScript: function(bytes) {
-      return(Buffer.from(bytes).toString('hex'));
-    },
+      return Buffer.from(bytes).toString("hex");
+    }
   }
-}
+};
 </script>
