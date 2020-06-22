@@ -71,6 +71,11 @@ import prettyBytes from "pretty-bytes";
 const TESTNET = "testnet";
 const MAINNET = "mainnet";
 
+// These can be changed to any BCHD gRPC endpoint.
+// The ones below are the default values in grpc-bchrpc-web.
+const MAINNET_URL = "https://bchd.greyh.at:8335";
+const TESTNET_URL = "https://bchd-testnet.greyh.at:18335";
+
 export default {
   name: "explorer",
   components: {
@@ -83,7 +88,7 @@ export default {
       result: "",
       infoResult: " ",
       input: "",
-      grpc: new GrpcClient({ testnet: this.testnet }),
+      grpc: this.newGrpcClient(),
       testnet: false,
       address: "",
       addressData: this.defaultAddressData(),
@@ -329,8 +334,14 @@ export default {
       };
     },
     updateNetwork: function() {
-      this.grpc = new GrpcClient({ testnet: this.testnet });
+      this.grpc = this.newGrpcClient();
       this.getInfo();
+    },
+    newGrpcClient: function() {
+      return new GrpcClient({
+        url: this.testnet ? TESTNET_URL : MAINNET_URL,
+        testnet: this.testnet
+      });
     },
     getInfo: async function() {
       try {
