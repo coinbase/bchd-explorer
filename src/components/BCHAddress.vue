@@ -1,12 +1,10 @@
+
 <!--
  Copyright 2020 Coinbase, Inc.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,6 +31,17 @@
           <td>Legacy Address</td>
           <td>{{addressData['legacy']}}</td>
         </tr>
+        <!-- 
+        NOTE: Slp Address is commented out because we don't want to convert to slp address for the user
+              without knowing they have an slp compatible wallet first!  This could be updated
+              to display the slp address if the user acknowledges the risks of address conversion
+              first.
+
+        <tr>
+          <td>Slp Address</td>
+          <td>{{addressData['slp']}}</td>
+        </tr> 
+        -->
         <tr>
           <td>Confirmed Transactions</td>
           <td>{{addressData['confirmed_transactions']}}</td>
@@ -47,12 +56,17 @@
         </tr>
       </tbody>
     </table>
+    <SLPAddress :tokens="addressData['tokens']" />
   </div>
 </template>
 
 <script>
+import SLPAddress from "./SLPAddress.vue";
 export default {
   name: "bchaddress",
-  props: ["address", "addressData"]
+  props: ["address", "addressData"],
+  components: {
+    SLPAddress
+  }
 };
 </script>
