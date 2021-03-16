@@ -18,9 +18,11 @@
   <div class="explorer">
     <section class="section">
       <div class="container has-text-right">
-        <input type="checkbox" id="checkbox" v-model="testnet" v-on:change="updateNetwork()" />
-        &nbsp;
-        <label for="checkbox">Testnet</label>
+        <select v-model="selectedNetwork" @change="updateNetwork">
+          <option v-for="node in nodes" :value="node.url" :key="node.url">
+            {{ node.url }} ({{ node.network }})
+          </option>
+        </select>
       </div>
       <div class="container">
         <img class="logo" src="../assets/bchd-explorer.svg" />
@@ -60,21 +62,17 @@
 </template>
 
 <script>
+import Big from "big.js";
 import { GrpcClient } from "grpc-bchrpc-web";
-import bchaddr from "bchaddrjs";
+import bchaddr from "bchaddrjs-slp";
 import BCHAddress from "./BCHAddress.vue";
 import BCHBlock from "./BCHBlock.vue";
 import BCHTransaction from "./BCHTransaction.vue";
 import sb from "satoshi-bitcoin";
 import prettyBytes from "pretty-bytes";
 
-const TESTNET = "testnet";
+const TESTNET3 = "testnet3";
 const MAINNET = "mainnet";
-
-// These can be changed to any BCHD gRPC endpoint.
-// The ones below are the default values in grpc-bchrpc-web.
-const MAINNET_URL = "https://bchd.greyh.at:8335";
-const TESTNET_URL = "https://bchd-testnet.greyh.at:18335";
 
 export default {
   name: "explorer",
@@ -86,7 +84,7 @@ export default {
   data: function() {
     return {
       result: "",
-      infoResult: " ",
+      infoResult: " ",
       input: "",
       grpc: this.newGrpcClient(),
       testnet: false,
@@ -96,28 +94,34 @@ export default {
       transactionData: this.defaultTransactionData(),
       block: "",
       blockData: this.defaultBlockData(),
-      getInfoBar: true
+      getInfoBar: true,
+      nodes: [
+        { url: "https://bchd.greyh.at:8335", network: MAINNET },
+        { url: "https://bchd-testnet.greyh.at:18335", network: TESTNET3 },
+        { url: "https://bchd.ny1.simpleledger.io", network: MAINNET },
+        { url: "https://bchd.nl1.simpleledger.io", network: MAINNET },
+        { url: "https://bchd.fountainhead.cash", network: MAINNET },
+        { url: "https://localhost:8335", network: MAINNET },
+        { url: "https://localhost:18335", network: TESTNET3 }
+      ],
+      selectedNetwork: "https://bchd.greyh.at:8335"
     };
   },
   mounted() {
-    this.testnet = this.$route.params.network === TESTNET;
+    this.testnet = this.$route.params.network === TESTNET3;
     this.updateNetwork();
-
     const params = this.$route.params;
     const input = params.address || params.blockHash || params.txId;
-
     if (input != undefined) {
       this.searchBCHD(input);
     }
   },
   watch: {
     $route(to) {
-      this.testnet = to.params.network === TESTNET;
+      this.testnet = to.params.network === TESTNET3;
       this.updateNetwork();
-
       this.input = "";
       const input = to.params.address || to.params.blockHash || to.params.txId;
-
       if (input != undefined) {
         this.searchBCHD(input);
       }
@@ -129,12 +133,10 @@ export default {
     },
     searchBCHD: async function(input) {
       this.resetState();
-
       if (input == "") {
         this.$router.push({ name: "home" }).catch(() => {});
         return;
       }
-
       if (bchaddr.isValidAddress(input)) {
         var addr = bchaddr.toCashAddress(input);
         await this.populateAddressData(addr);
@@ -149,7 +151,6 @@ export default {
           .catch(() => {});
         return;
       }
-
       var blockData = await this.populateBlockData(input);
       if (blockData === true) {
         this.$router
@@ -163,7 +164,6 @@ export default {
           .catch(() => {});
         return;
       }
-
       var transactionData = await this.populateTransactionData(input);
       if (transactionData === true) {
         this.$router
@@ -177,17 +177,17 @@ export default {
           .catch(() => {});
         return;
       }
-
       this.result = "No address, transaction or block hash/height found.";
     },
     determineNetwork: function() {
-      return this.testnet ? TESTNET : MAINNET;
+      return this.testnet ? TESTNET3 : MAINNET;
     },
     populateAddressData: async function(addr) {
       try {
         var addrUtxoResult = await this.grpc.getAddressUtxos({
           address: addr,
-          includeMempool: true
+          includeMempool: true,
+          includeTokenMetadata: true
         });
         var addrResult = await this.grpc.getAddressTransactions({
           address: addr,
@@ -202,26 +202,71 @@ export default {
         this.addressData["satoshis"] = total;
         this.addressData["balance"] = sb.toBitcoin(total);
         this.addressData["legacy"] = bchaddr.toLegacyAddress(addr);
+        this.addressData["cash"] = bchaddr.toCashAddress(addr);
+        this.addressData["slp"] = bchaddr.toSlpAddress(addr);
         this.addressData[
           "confirmed_transactions"
         ] = addrResult.getConfirmedTransactionsList().length;
         this.addressData[
           "unconfirmed_transactions"
         ] = addrResult.getUnconfirmedTransactionsList().length;
+        const _tokens = new Map();
+        const tokenMetadata = new Map();
+        addrUtxoResult.getTokenMetadataList().forEach(tm => {
+          const _id = Buffer.from(tm.getTokenId_asU8()).toString("hex");
+          const _tmObj = { token_id: _id, name: "", ticker: "" };
+          tokenMetadata.set(_id, _tmObj);
+          if (tm.hasV1Fungible()) {
+            _tmObj.name = tm.getV1Fungible().getTokenName();
+            _tmObj.ticker = Buffer.from(tm.getV1Fungible().getTokenTicker()).toString("utf8");
+            _tmObj.document_url = tm.getV1Fungible().getTokenDocumentUrl() !== "" ? tm.getV1Fungible().getTokenDocumentUrl() : "NA";
+            _tmObj.document_hash = tm.getV1Fungible().getTokenDocumentHash() !== "" ? tm.getV1Fungible().getTokenDocumentHash() : "NA";
+            _tmObj.mint_baton_txid = Buffer.from(tm.getV1Fungible().getMintBatonHash_asU8().slice().reverse()).toString("hex");
+            _tmObj.mint_baton_vout = tm.getV1Fungible().getMintBatonVout();
+          } else if (tm.hasV1Nft1Group()) {
+            _tmObj.name = tm.getV1Nft1Group().getTokenName();
+            _tmObj.ticker = tm.getV1Nft1Group().getTokenTicker();
+            _tmObj.document_url = tm.getV1Nft1Group().getTokenDocumentUrl() !== "" ? tm.getV1Nft1Group().getTokenDocumentUrl() : "NA";
+            _tmObj.document_hash = tm.getV1Nft1Group().getTokenDocumentHash_asB64() ? tm.getV1Nft1Group().getTokenDocumentHash() : "NA";
+            _tmObj.mint_baton_txid = Buffer.from(tm.getV1Nft1Group().getMintBatonHash_asU8().slice().reverse()).toString("hex");
+            _tmObj.mint_baton_vout = tm.getV1Nft1Group().getMintBatonVout();
+          } else if (tm.hasV1Nft1Child()) {
+            _tmObj.name = tm.getV1Nft1Child().getTokenName();
+            _tmObj.ticker = tm.getV1Nft1Child().getTokenTicker();
+            _tmObj.document_url = tm.getV1Nft1Child().getTokenDocumentUrl() !== "" ? tm.getV1Nft1Child().getTokenDocumentUrl() : "NA";
+            _tmObj.document_hash = tm.getV1Nft1Child().getTokenDocumentHash_asB64() ? Buffer.from(tm.getV1Nft1Child().getTokenDocumentHash_asU8()).toString("utf8") : "NA";
+            _tmObj.nft_group_id = Buffer.from(tm.getV1Nft1Child().getGroupId_asU8()).toString("hex");
+          }
+        });
+        addrUtxoResult.getOutputsList().forEach(function(a) {
+          if (a.getSlpToken()) {
+            const tok = a.getSlpToken();
+            const tokenID = Buffer.from(tok.getTokenId_asU8()).toString("hex");
+            if (_tokens.has(tokenID)) {
+              const _tok = _tokens.get(tokenID);
+              _tok.balance = _tok.balance.add(tok.getAmount());
+            } else {
+              _tokens.set(tokenID, {
+                token_id: tokenID,
+                token_metadata: tokenMetadata.get(tokenID),
+                decimals: tok.getDecimals(),
+                balance: Big(tok.getAmount())
+              });
+            }
+          }
+        });
+        this.addressData["tokens"] = Array.from(_tokens).map(v => v[1]);
       } catch (error) {
         this.result = "Address not found.";
       }
     },
     populateBlockData: async function(input) {
       var blockFinder = "hash";
-
       if (input >= 0 && input < 10000000) {
         blockFinder = "height";
       }
-
       try {
         var blockResult = "";
-
         if (blockFinder === "height") {
           blockResult = await this.grpc.getBlockInfo({ index: input });
         } else {
@@ -230,9 +275,7 @@ export default {
             reversedHashOrder: true
           });
         }
-
         var blockInfo = blockResult.getInfo();
-
         this.block = this.convertHash(blockInfo.getHash());
         this.blockData["height"] = blockInfo.getHeight();
         this.blockData["version"] = blockInfo.getVersion();
@@ -254,7 +297,6 @@ export default {
         }
         this.blockData["size"] = prettyBytes(blockInfo.getSize());
         this.blockData["median_time"] = blockInfo.getMedianTime();
-
         return true;
       } catch (error) {
         return false;
@@ -264,7 +306,8 @@ export default {
       try {
         var txResult = await this.grpc.getTransaction({
           hash: input,
-          reversedHashOrder: true
+          reversedHashOrder: true,
+          includeTokenMetadata: true
         });
         this.transaction = input;
         var tx = txResult.getTransaction();
@@ -279,7 +322,107 @@ export default {
         );
         this.transactionData["inputs"] = tx.getInputsList();
         this.transactionData["outputs"] = tx.getOutputsList();
-
+        // set some slp properties
+        this.transactionData["slp_action"] = tx.getSlpTransactionInfo().getSlpAction();
+        this.transactionData["slp_action_str"] = this.mapSlpTransactionTypeString(this.transactionData["slp_action"]);
+        this.transactionData["slp_valid"] = tx.getSlpTransactionInfo().getValidityJudgement();
+        this.transactionData["slp_parse_error"] = tx.getSlpTransactionInfo().getParseError();
+        this.transactionData["burn_flags"] = this.mapBurnFlagToString(tx.getSlpTransactionInfo().getBurnFlagsList());
+        
+        const inputAmtMap = new Map();
+        let outputAmt = Big(0);
+        // loop through txn outputs set view data for slp tokens
+        this.transactionData["outputs"].forEach((o) => {
+          o.token = undefined;
+          if (o.getSlpToken()) {
+            let tok = o.getSlpToken();
+            if (tok) {
+              o.token = {};
+              o.token.amount = Big(tok.getAmount()).div(10**tok.getDecimals());
+              outputAmt = outputAmt.add(o.token.amount);
+              o.token.isMintBaton = tok.getIsMintBaton();
+              o.token.decimals = tok.getDecimals();
+              o.token.address = tok.getAddress();
+            }
+          }
+        });
+        // set token metadata for valid slp transaction
+        if (this.transactionData["slp_valid"]) {
+          const tm = txResult.getTokenMetadata();
+          const _id = Buffer.from(tm.getTokenId_asU8()).toString("hex");
+          const _tmObj = { token_id: _id, name: "", ticker: ""};
+          _tmObj.token_type = tm.getTokenType();
+          if (tm.hasV1Fungible()) {
+            _tmObj.name = tm.getV1Fungible().getTokenName();
+            _tmObj.ticker = tm.getV1Fungible().getTokenTicker();
+          } else if (tm.hasV1Nft1Group()) {
+            _tmObj.name = tm.getV1Nft1Group().getTokenName();
+            _tmObj.ticker = tm.getV1Nft1Group().getTokenTicker();
+          } else if (tm.hasV1Nft1Child()) {
+            _tmObj.name = tm.getV1Nft1Child().getTokenName();
+            _tmObj.ticker = tm.getV1Nft1Child().getTokenTicker();
+            _tmObj.nft_group_id = Buffer.from(tm.getV1Nft1Child().getGroupId()).toString("hex");
+          }
+          if (_tmObj.name === "") {
+            _tmObj.name = "NA";
+          }
+          if (_tmObj.ticker === "") {
+            _tmObj.ticker = "tokens";
+          }
+          this.transactionData["token_metadata"] = _tmObj;
+        }
+        // loop through txn inputs to populate slp token view data
+        const dat = this.transactionData;
+        this.transactionData["inputs"].forEach((i) => {
+          i.token = undefined;
+          if (i.getSlpToken()) {
+            let tok = i.getSlpToken();
+            if (tok) {
+              i.token = {};
+              i.token.amount = Big(tok.getAmount()).div(10**tok.getDecimals());
+              i.token.isMintBaton = tok.getIsMintBaton();
+              i.token.decimals = tok.getDecimals();
+              i.token.token_id = Buffer.from(tok.getTokenId_asU8()).toString("hex");
+              i.token.slp_action = tok.getSlpAction();
+              i.token.token_type = tok.getTokenType();
+              if (dat.token_metadata) {
+                if (i.token.token_id !== dat.token_metadata.token_id || i.token.token_type !== dat.token_metadata.token_type) {
+                  i.token.isBurned = true;
+                  i.token.ticker = "";
+                } else {
+                  i.token.ticker = dat["token_metadata"].ticker;
+                }
+              }
+              // enumerate inputs for displaying burn quantity
+              if (! inputAmtMap.has(i.token.token_id + i.token.token_type)) {
+                inputAmtMap.set(i.token.token_id + i.token.token_type, i.token.amount);
+              } else {
+                let totalAmt = inputAmtMap.get(i.token.token_id + i.token.token_type);
+                totalAmt = totalAmt.add(i.token.amount);
+                inputAmtMap.set(i.token.token_id + i.token.token_type, totalAmt);
+              }
+              if (dat.burn_flags.includes("BURNED_INPUTS_OUTPUTS_TOO_HIGH") || dat.burn_flags.includes("BURNED_INPUTS_BAD_OPRETURN")) {
+                i.token.isBurned = true;
+                i.token.ticker = "";
+              }
+            }
+          }
+        });
+        // set burned amount to display
+        if (dat.token_metadata) {
+          for (const amt of inputAmtMap) {
+            if (amt[0] === dat.token_metadata.token_id + dat.token_metadata.token_type) {
+              amt[1] = amt[1].sub(outputAmt);
+              if (amt[1].gt(0)) {
+                dat.burn_amt_this_token = amt[1].toFixed();
+              }
+            } else {
+              dat.burns_from_other_tokens = true;
+            }
+          }
+        } else if (inputAmtMap.size > 0) {
+          dat.burns_from_other_tokens = true;
+        }
         return true;
       } catch (error) {
         return false;
@@ -300,8 +443,10 @@ export default {
         satoshis: 0,
         utxos: 0,
         legacy: "",
+        slp: "",
         confirmed_transactions: 0,
-        unconfirmed_transactions: 0
+        unconfirmed_transactions: 0,
+        tokens: [],
       };
     },
     defaultBlockData: function() {
@@ -330,17 +475,25 @@ export default {
         block_height: 0,
         block_hash: "",
         inputs: [],
-        outputs: []
+        outputs: [],
+        token_metadata: undefined,
+        slp_action: 0,
+        slp_action_str: "",
+        slp_valid: false,
+        slp_parse_error: ""
       };
     },
     updateNetwork: function() {
+      this.resetState();
+      this.infoResult = "Not connected (select another server)";
+      this.grpc = null;
       this.grpc = this.newGrpcClient();
       this.getInfo();
     },
     newGrpcClient: function() {
       return new GrpcClient({
-        url: this.testnet ? TESTNET_URL : MAINNET_URL,
-        testnet: this.testnet
+        url: this.selectedNetwork,
+        testnet: false
       });
     },
     getInfo: async function() {
@@ -360,7 +513,62 @@ export default {
       })
         .reverse()
         .join("");
-    }
+    },
+    mapSlpTransactionTypeString: function(type) {
+      switch (type) {
+        case 0:
+          return "NON_SLP";
+        case 1:
+          return "NON_SLP_BURN";
+        case 2:
+          return "SLP_PARSE_ERROR";
+        case 3:
+          return "SLP_UNSUPPORTED_VERSION";
+        case 4:
+          return "SLP_V1_GENESIS";
+        case 5:
+          return "SLP_V1_MINT";
+        case 6:
+          return "SLP_V1_SEND";
+        case 7:
+          return "SLP_V1_NFT1_GROUP_GENESIS";
+        case 8:
+          return "SLP_V1_NFT1_GROUP_MINT";
+        case 9:
+          return "SLP_V1_NFT1_GROUP_SEND";
+        case 10:
+          return "SLP_V1_NFT1_UNIQUE_CHILD_GENESIS";
+        case 11:
+          return "SLP_V1_NFT1_UNIQUE_CHILD_SEND";
+        default:
+          return "unknown type";
+      }
+    },
+    mapBurnFlagToString: function(flags) {
+      let flagStr = "";
+      flags.forEach((f) => {
+        switch(f) {
+          case 0:
+            flagStr = flagStr + "BURNED_INPUTS_OUTPUTS_TOO_HIGH\n";
+            break;
+          case 1:
+            flagStr = flagStr + "BURNED_INPUTS_BAD_OPRETURN\n";
+            break;
+          case 2:
+            flagStr = flagStr + "BURNED_INPUTS_OTHER_TOKEN\n";
+            break;
+          case 3:
+            flagStr = flagStr + "BURNED_OUTPUTS_MISSING_BCH_VOUT\n";
+            break;
+          case 4:
+            flagStr = flagStr + "BURNED_INPUTS_GREATER_THAN_OUTPUTS\n";
+            break;
+          default:
+            flagStr = flagStr + "unknown burn type\n"
+        }
+      });
+      return flagStr;
+    },
   },
   created: function() {
     if (this.getInfoBar) {

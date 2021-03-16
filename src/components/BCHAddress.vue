@@ -1,12 +1,10 @@
+
 <!--
  Copyright 2020 Coinbase, Inc.
-
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0
-
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,6 +32,14 @@
           <td>{{addressData['legacy']}}</td>
         </tr>
         <tr>
+          <td>Cash Address</td>
+          <td>{{addressData['cash']}}</td>
+        </tr>
+        <tr>
+          <td>Slp Address</td>
+          <td>{{addressData['slp']}}</td>
+        </tr>
+        <tr>
           <td>Confirmed Transactions</td>
           <td>{{addressData['confirmed_transactions']}}</td>
         </tr>
@@ -47,12 +53,17 @@
         </tr>
       </tbody>
     </table>
+    <SLPAddress :tokens="addressData['tokens']" />
   </div>
 </template>
 
 <script>
+import SLPAddress from "./SLPAddress.vue";
 export default {
   name: "bchaddress",
-  props: ["address", "addressData"]
+  props: ["address", "addressData"],
+  components: {
+    SLPAddress
+  }
 };
 </script>
