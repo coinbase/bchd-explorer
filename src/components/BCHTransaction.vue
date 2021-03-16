@@ -96,8 +96,8 @@
         </tr>
       </tbody>
     </table>
-    <h2 v-if="transactionData['inputs'].length === 1">1 Txn Input</h2>
-    <h2 v-else>{{transactionData['inputs'].length}} Txn Inputs</h2>
+    <h2 v-if="transactionData['inputs'].length === 1">1 Input</h2>
+    <h2 v-else>{{transactionData['inputs'].length}} Inputs</h2>
     <table
       class="table is-bordered is-striped"
       align="center"
@@ -106,7 +106,7 @@
     >
       <tbody>
         <tr>
-          <td>Input index</td>
+          <td>Index</td>
           <td>{{item.getIndex()}}</td>
         </tr>
         <tr v-if="item.token">
@@ -148,8 +148,8 @@
         </tr>
       </tbody>
     </table>
-    <h2 v-if="transactionData['outputs'].length === 1">1 Txn Output</h2>
-    <h2 v-else>{{transactionData['outputs'].length}} Txn Outputs</h2>
+    <h2 v-if="transactionData['outputs'].length === 1">1 Output</h2>
+    <h2 v-else>{{transactionData['outputs'].length}} Outputs</h2>
     <table
       class="table is-bordered is-striped"
       align="center"
@@ -158,7 +158,7 @@
     >
       <tbody>
         <tr>
-          <td>Output index</td>
+          <td>Index</td>
           <td>{{item.getIndex()}}</td>
         </tr>
         <tr v-if="item.token">
