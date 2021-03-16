@@ -327,12 +327,6 @@ export default {
         this.transactionData["slp_valid"] = tx.getSlpTransactionInfo().getValidityJudgement();
         this.transactionData["slp_parse_error"] = tx.getSlpTransactionInfo().getParseError();
         this.transactionData["burn_flags"] = this.mapBurnFlagToString(tx.getSlpTransactionInfo().getBurnFlagsList());
-        // // set slp group id
-        // if (tx.getSlpTransactionInfo().hasV1Nft1ChildGenesis()) {
-        //   this.transactionData["slp_group_id"] = Buffer.from(tx.getSlpTransactionInfo().getV1Nft1ChildGenesis().getGroupTokenId_asU8()).toString("hex");
-        // } else if (tx.getSlpTransactionInfo().hasNft1ChildSend()) {
-        //   this.transactionData["slp_group_id"] = Buffer.from(tx.getSlpTransactionInfo().getV1Nft1ChildSend().getGroupTokenId_asU8()).toString("hex");
-        // }
         
         const inputAmtMap = new Map();
         let outputAmt = Big(0);
