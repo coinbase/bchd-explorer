@@ -135,7 +135,7 @@
           <td>{{item.getSequence()}}</td>
         </tr>
         <tr>
-          <td>Value</td>
+          <td>Satoshis</td>
           <td>{{item.getValue()}}</td>
         </tr>
         <tr>
@@ -166,7 +166,7 @@
           <td>{{item.token.isMintBaton ? "MINT BATON" : item.token.amount}} {{item.token.isMintBaton ? "" : transactionData.token_metadata.ticker}}</td>
         </tr>
         <tr>
-          <td>BCH Satoshis</td>
+          <td>Satoshis</td>
           <td>{{item.getValue()}}</td>
         </tr>
         <tr>
