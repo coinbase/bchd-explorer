@@ -31,17 +31,10 @@
           <td>Legacy Address</td>
           <td>{{addressData['legacy']}}</td>
         </tr>
-        <!-- 
-        NOTE: Slp Address is commented out because we don't want to convert to slp address for the user
-              without knowing they have an slp compatible wallet first!  This could be updated
-              to display the slp address if the user acknowledges the risks of address conversion
-              first.
-
         <tr>
           <td>Slp Address</td>
           <td>{{addressData['slp']}}</td>
         </tr> 
-        -->
         <tr>
           <td>Confirmed Transactions</td>
           <td>{{addressData['confirmed_transactions']}}</td>
