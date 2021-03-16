@@ -32,9 +32,13 @@
           <td>{{addressData['legacy']}}</td>
         </tr>
         <tr>
+          <td>Cash Address</td>
+          <td>{{addressData['cash']}}</td>
+        </tr>
+        <tr>
           <td>Slp Address</td>
           <td>{{addressData['slp']}}</td>
-        </tr> 
+        </tr>
         <tr>
           <td>Confirmed Transactions</td>
           <td>{{addressData['confirmed_transactions']}}</td>

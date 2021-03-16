@@ -202,6 +202,7 @@ export default {
         this.addressData["satoshis"] = total;
         this.addressData["balance"] = sb.toBitcoin(total);
         this.addressData["legacy"] = bchaddr.toLegacyAddress(addr);
+        this.addressData["cash"] = bchaddr.toCashAddress(addr);
         this.addressData["slp"] = bchaddr.toSlpAddress(addr);
         this.addressData[
           "confirmed_transactions"
