@@ -490,6 +490,12 @@ export default {
       this.grpc = null;
       this.grpc = this.newGrpcClient();
       this.getInfo();
+      this.testnet = this.$route.params.network === TESTNET3;
+      const params = this.$route.params;
+      const input = params.address || params.blockHash || params.txId;
+      if (input != undefined) {
+        this.searchBCHD(input);
+      }
     },
     newGrpcClient: function() {
       return new GrpcClient({
