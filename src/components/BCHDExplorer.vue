@@ -20,10 +20,11 @@
       <div class="container has-text-right">
         <select v-model="selectedNetwork" @change="updateNetwork">
           <option v-for="node in nodes" :value="node.url" :key="node.url">
-            {{ node.url }} ({{ node.network }})
+            {{ node.name }} ({{ node.network }})
           </option>
         </select>
       </div>
+      <br>
       <div class="container">
         <img class="logo" src="../assets/bchd-explorer.svg" />
         <div class="field">
@@ -96,13 +97,13 @@ export default {
       blockData: this.defaultBlockData(),
       getInfoBar: true,
       nodes: [
-        { url: "https://bchd.greyh.at:8335", network: MAINNET },
-        { url: "https://bchd-testnet.greyh.at:18335", network: TESTNET3 },
-        { url: "https://bchd.ny1.simpleledger.io", network: MAINNET },
-        { url: "https://bchd.nl1.simpleledger.io", network: MAINNET },
-        { url: "https://bchd.fountainhead.cash", network: MAINNET },
-        { url: "https://localhost:8335", network: MAINNET },
-        { url: "https://localhost:18335", network: TESTNET3 }
+        { url: "https://bchd.greyh.at:8335", name: "bchd.greyh.at", network: MAINNET },
+        { url: "https://bchd-testnet.greyh.at:18335", name: "bchd-testnet.greyh.at", network: TESTNET3 },
+        { url: "https://bchd.ny1.simpleledger.io", name: "bchd.ny1.simpleledger.io", network: MAINNET },
+        { url: "https://bchd.nl1.simpleledger.io", name: "bchd.nl1.simpleledger.io", network: MAINNET },
+        { url: "https://bchd.fountainhead.cash", name: "bchd.fountainhead.cash", network: MAINNET },
+        { url: "https://localhost:8335", name: "localhost:8335", network: MAINNET },
+        { url: "https://localhost:18335", name: "localhost:18335", network: TESTNET3 }
       ],
       selectedNetwork: "https://bchd.greyh.at:8335"
     };
@@ -489,6 +490,12 @@ export default {
       this.grpc = null;
       this.grpc = this.newGrpcClient();
       this.getInfo();
+      this.testnet = this.$route.params.network === TESTNET3;
+      const params = this.$route.params;
+      const input = params.address || params.blockHash || params.txId;
+      if (input != undefined) {
+        this.searchBCHD(input);
+      }
     },
     newGrpcClient: function() {
       return new GrpcClient({
