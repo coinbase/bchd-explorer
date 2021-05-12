@@ -98,11 +98,12 @@ export default {
       getInfoBar: true,
       nodes: [
         { url: "https://bchd.greyh.at:8335", name: "bchd.greyh.at", network: MAINNET },
-        { url: "https://bchd-testnet.greyh.at:18335", name: "bchd-testnet.greyh.at", network: TESTNET3 },
-        { url: "https://bchd.ny1.simpleledger.io", name: "bchd.ny1.simpleledger.io", network: MAINNET },
-        { url: "https://bchd.nl1.simpleledger.io", name: "bchd.nl1.simpleledger.io", network: MAINNET },
+        { url: "https://bchd-mainnet.electroncash.de:8335", name: "bchd-mainnet.electroncash.de", network: MAINNET },
         { url: "https://bchd.fountainhead.cash", name: "bchd.fountainhead.cash", network: MAINNET },
+        { url: "https://bchd.imaginary.cash:8335", name: "bchd.imaginary.cash", network: MAINNET },
         { url: "https://localhost:8335", name: "localhost:8335", network: MAINNET },
+        { url: "https://bchd-testnet.electroncash.de:18335", name: "bchd-testnet.electroncash.de", network: TESTNET3 },
+        { url: "https://bchd-testnet.greyh.at:18335", name: "bchd-testnet.greyh.at", network: TESTNET3 },
         { url: "https://localhost:18335", name: "localhost:18335", network: TESTNET3 }
       ],
       selectedNetwork: "https://bchd.greyh.at:8335"
