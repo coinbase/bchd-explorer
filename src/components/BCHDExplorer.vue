@@ -24,7 +24,7 @@
           </option>
         </select>
       </div>
-      <br>
+      <br />
       <div class="container">
         <img class="logo" src="../assets/bchd-explorer.svg" />
         <div class="field">
@@ -44,9 +44,15 @@
           </div>
         </div>
       </div>
-      <div class="info-result container has-text-centered info-result">{{infoResult}}</div>
-      <div class="container results has-text-centered" v-show="result.length" v-cloak>
-        <strong>{{result}}</strong>
+      <div class="info-result container has-text-centered info-result">
+        {{ infoResult }}
+      </div>
+      <div
+        class="container results has-text-centered"
+        v-show="result.length"
+        v-cloak
+      >
+        <strong>{{ result }}</strong>
       </div>
       <div class="container results" v-show="address.length" v-cloak>
         <BCHAddress :address="address" :addressData="addressData" />
@@ -55,10 +61,15 @@
         <BCHBlock :block="block" :blockData="blockData" />
       </div>
       <div class="container results" v-show="transaction.length" v-cloak>
-        <BCHTransaction :transaction="transaction" v-bind:transactionData="transactionData" />
+        <BCHTransaction
+          :transaction="transaction"
+          v-bind:transactionData="transactionData"
+        />
       </div>
     </section>
-    <footer class="has-text-centered">Copyright &copy; 2020 Coinbase — All rights reserved.</footer>
+    <footer class="has-text-centered">
+      Copyright &copy; 2020 Coinbase — All rights reserved.
+    </footer>
   </div>
 </template>
 
@@ -80,9 +91,9 @@ export default {
   components: {
     BCHAddress,
     BCHBlock,
-    BCHTransaction
+    BCHTransaction,
   },
-  data: function() {
+  data: function () {
     return {
       result: "",
       infoResult: " ",
@@ -97,43 +108,67 @@ export default {
       blockData: this.defaultBlockData(),
       getInfoBar: true,
       nodes: [
-        { url: "https://bchd.greyh.at:8335", name: "bchd.greyh.at", network: MAINNET },
-        { url: "https://bchd-mainnet.electroncash.de:8335", name: "bchd-mainnet.electroncash.de", network: MAINNET },
-        { url: "https://bchd.fountainhead.cash", name: "bchd.fountainhead.cash", network: MAINNET },
-        { url: "https://bchd.imaginary.cash:8335", name: "bchd.imaginary.cash", network: MAINNET },
-        { url: "https://localhost:8335", name: "localhost:8335", network: MAINNET },
-        { url: "https://bchd-testnet.electroncash.de:18335", name: "bchd-testnet.electroncash.de", network: TESTNET3 },
-        { url: "https://bchd-testnet.greyh.at:18335", name: "bchd-testnet.greyh.at", network: TESTNET3 },
-        { url: "https://localhost:18335", name: "localhost:18335", network: TESTNET3 }
+        {
+          url: "https://bchd.greyh.at:8335",
+          name: "bchd.greyh.at",
+          network: MAINNET,
+        },
+        {
+          url: "https://bchd-mainnet.electroncash.de:8335",
+          name: "bchd-mainnet.electroncash.de",
+          network: MAINNET,
+        },
+        {
+          url: "https://bchd.fountainhead.cash",
+          name: "bchd.fountainhead.cash",
+          network: MAINNET,
+        },
+        {
+          url: "https://bchd.imaginary.cash:8335",
+          name: "bchd.imaginary.cash",
+          network: MAINNET,
+        },
+        {
+          url: "https://localhost:8335",
+          name: "localhost:8335",
+          network: MAINNET,
+        },
+        {
+          url: "https://bchd-testnet.electroncash.de:18335",
+          name: "bchd-testnet.electroncash.de",
+          network: TESTNET3,
+        },
+        {
+          url: "https://bchd-testnet.greyh.at:18335",
+          name: "bchd-testnet.greyh.at",
+          network: TESTNET3,
+        },
+        {
+          url: "https://localhost:18335",
+          name: "localhost:18335",
+          network: TESTNET3,
+        },
       ],
-      selectedNetwork: "https://bchd.greyh.at:8335"
+      selectedNetwork: "https://bchd.greyh.at:8335",
     };
   },
   mounted() {
     this.testnet = this.$route.params.network === TESTNET3;
     this.updateNetwork();
-    const params = this.$route.params;
-    const input = params.address || params.blockHash || params.txId;
-    if (input != undefined) {
-      this.searchBCHD(input);
-    }
   },
   watch: {
     $route(to) {
       this.testnet = to.params.network === TESTNET3;
-      this.updateNetwork();
-      this.input = "";
-      const input = to.params.address || to.params.blockHash || to.params.txId;
-      if (input != undefined) {
-        this.searchBCHD(input);
-      }
-    }
+    },
   },
   methods: {
-    search: async function() {
+    debug(val) {
+      window.console.log(val);
+    },
+    search: async function () {
       this.searchBCHD(this.input);
     },
-    searchBCHD: async function(input) {
+    searchBCHD: async function (input) {
       this.resetState();
       if (input == "") {
         this.$router.push({ name: "home" }).catch(() => {});
@@ -147,8 +182,8 @@ export default {
             name: "address",
             params: {
               network: this.determineNetwork(),
-              address: input
-            }
+              address: input,
+            },
           })
           .catch(() => {});
         return;
@@ -160,8 +195,8 @@ export default {
             name: "block",
             params: {
               network: this.determineNetwork(),
-              blockHash: input
-            }
+              blockHash: input,
+            },
           })
           .catch(() => {});
         return;
@@ -173,31 +208,31 @@ export default {
             name: "tx",
             params: {
               network: this.determineNetwork(),
-              txId: input
-            }
+              txId: input,
+            },
           })
           .catch(() => {});
         return;
       }
       this.result = "No address, transaction or block hash/height found.";
     },
-    determineNetwork: function() {
+    determineNetwork: function () {
       return this.testnet ? TESTNET3 : MAINNET;
     },
-    populateAddressData: async function(addr) {
+    populateAddressData: async function (addr) {
       try {
         var addrUtxoResult = await this.grpc.getAddressUtxos({
           address: addr,
           includeMempool: true,
-          includeTokenMetadata: true
+          includeTokenMetadata: true,
         });
         var addrResult = await this.grpc.getAddressTransactions({
           address: addr,
-          nbFetch: 10000
+          nbFetch: 10000,
         });
         this.address = addr;
         var total = 0;
-        addrUtxoResult.getOutputsList().forEach(function(a) {
+        addrUtxoResult.getOutputsList().forEach(function (a) {
           total += a.getValue();
         });
         this.addressData["utxos"] = addrUtxoResult.getOutputsList().length;
@@ -206,41 +241,69 @@ export default {
         this.addressData["legacy"] = bchaddr.toLegacyAddress(addr);
         this.addressData["cash"] = bchaddr.toCashAddress(addr);
         this.addressData["slp"] = bchaddr.toSlpAddress(addr);
-        this.addressData[
-          "confirmed_transactions"
-        ] = addrResult.getConfirmedTransactionsList().length;
-        this.addressData[
-          "unconfirmed_transactions"
-        ] = addrResult.getUnconfirmedTransactionsList().length;
+        this.addressData["confirmed_transactions"] =
+          addrResult.getConfirmedTransactionsList().length;
+        this.addressData["unconfirmed_transactions"] =
+          addrResult.getUnconfirmedTransactionsList().length;
         const _tokens = new Map();
         const tokenMetadata = new Map();
-        addrUtxoResult.getTokenMetadataList().forEach(tm => {
+        addrUtxoResult.getTokenMetadataList().forEach((tm) => {
           const _id = Buffer.from(tm.getTokenId_asU8()).toString("hex");
           const _tmObj = { token_id: _id, name: "", ticker: "" };
           tokenMetadata.set(_id, _tmObj);
           if (tm.hasV1Fungible()) {
             _tmObj.name = tm.getV1Fungible().getTokenName();
-            _tmObj.ticker = Buffer.from(tm.getV1Fungible().getTokenTicker()).toString("utf8");
-            _tmObj.document_url = tm.getV1Fungible().getTokenDocumentUrl() !== "" ? tm.getV1Fungible().getTokenDocumentUrl() : "NA";
-            _tmObj.document_hash = tm.getV1Fungible().getTokenDocumentHash() !== "" ? tm.getV1Fungible().getTokenDocumentHash() : "NA";
-            _tmObj.mint_baton_txid = Buffer.from(tm.getV1Fungible().getMintBatonHash_asU8().slice().reverse()).toString("hex");
+            _tmObj.ticker = Buffer.from(
+              tm.getV1Fungible().getTokenTicker()
+            ).toString("utf8");
+            _tmObj.document_url =
+              tm.getV1Fungible().getTokenDocumentUrl() !== ""
+                ? tm.getV1Fungible().getTokenDocumentUrl()
+                : "NA";
+            _tmObj.document_hash =
+              tm.getV1Fungible().getTokenDocumentHash() !== ""
+                ? tm.getV1Fungible().getTokenDocumentHash()
+                : "NA";
+            _tmObj.mint_baton_txid = Buffer.from(
+              tm.getV1Fungible().getMintBatonHash_asU8().slice().reverse()
+            ).toString("hex");
             _tmObj.mint_baton_vout = tm.getV1Fungible().getMintBatonVout();
           } else if (tm.hasV1Nft1Group()) {
             _tmObj.name = tm.getV1Nft1Group().getTokenName();
             _tmObj.ticker = tm.getV1Nft1Group().getTokenTicker();
-            _tmObj.document_url = tm.getV1Nft1Group().getTokenDocumentUrl() !== "" ? tm.getV1Nft1Group().getTokenDocumentUrl() : "NA";
-            _tmObj.document_hash = tm.getV1Nft1Group().getTokenDocumentHash_asB64() ? tm.getV1Nft1Group().getTokenDocumentHash() : "NA";
-            _tmObj.mint_baton_txid = Buffer.from(tm.getV1Nft1Group().getMintBatonHash_asU8().slice().reverse()).toString("hex");
+            _tmObj.document_url =
+              tm.getV1Nft1Group().getTokenDocumentUrl() !== ""
+                ? tm.getV1Nft1Group().getTokenDocumentUrl()
+                : "NA";
+            _tmObj.document_hash = tm
+              .getV1Nft1Group()
+              .getTokenDocumentHash_asB64()
+              ? tm.getV1Nft1Group().getTokenDocumentHash()
+              : "NA";
+            _tmObj.mint_baton_txid = Buffer.from(
+              tm.getV1Nft1Group().getMintBatonHash_asU8().slice().reverse()
+            ).toString("hex");
             _tmObj.mint_baton_vout = tm.getV1Nft1Group().getMintBatonVout();
           } else if (tm.hasV1Nft1Child()) {
             _tmObj.name = tm.getV1Nft1Child().getTokenName();
             _tmObj.ticker = tm.getV1Nft1Child().getTokenTicker();
-            _tmObj.document_url = tm.getV1Nft1Child().getTokenDocumentUrl() !== "" ? tm.getV1Nft1Child().getTokenDocumentUrl() : "NA";
-            _tmObj.document_hash = tm.getV1Nft1Child().getTokenDocumentHash_asB64() ? Buffer.from(tm.getV1Nft1Child().getTokenDocumentHash_asU8()).toString("utf8") : "NA";
-            _tmObj.nft_group_id = Buffer.from(tm.getV1Nft1Child().getGroupId_asU8()).toString("hex");
+            _tmObj.document_url =
+              tm.getV1Nft1Child().getTokenDocumentUrl() !== ""
+                ? tm.getV1Nft1Child().getTokenDocumentUrl()
+                : "NA";
+            _tmObj.document_hash = tm
+              .getV1Nft1Child()
+              .getTokenDocumentHash_asB64()
+              ? Buffer.from(
+                  tm.getV1Nft1Child().getTokenDocumentHash_asU8()
+                ).toString("utf8")
+              : "NA";
+            _tmObj.nft_group_id = Buffer.from(
+              tm.getV1Nft1Child().getGroupId_asU8()
+            ).toString("hex");
           }
         });
-        addrUtxoResult.getOutputsList().forEach(function(a) {
+        addrUtxoResult.getOutputsList().forEach(function (a) {
           if (a.getSlpToken()) {
             const tok = a.getSlpToken();
             const tokenID = Buffer.from(tok.getTokenId_asU8()).toString("hex");
@@ -252,17 +315,17 @@ export default {
                 token_id: tokenID,
                 token_metadata: tokenMetadata.get(tokenID),
                 decimals: tok.getDecimals(),
-                balance: Big(tok.getAmount())
+                balance: Big(tok.getAmount()),
               });
             }
           }
         });
-        this.addressData["tokens"] = Array.from(_tokens).map(v => v[1]);
+        this.addressData["tokens"] = Array.from(_tokens).map((v) => v[1]);
       } catch (error) {
         this.result = "Address not found.";
       }
     },
-    populateBlockData: async function(input) {
+    populateBlockData: async function (input) {
       var blockFinder = "hash";
       if (input >= 0 && input < 10000000) {
         blockFinder = "height";
@@ -274,7 +337,7 @@ export default {
         } else {
           blockResult = await this.grpc.getBlockInfo({
             hash: input,
-            reversedHashOrder: true
+            reversedHashOrder: true,
           });
         }
         var blockInfo = blockResult.getInfo();
@@ -304,12 +367,12 @@ export default {
         return false;
       }
     },
-    populateTransactionData: async function(input) {
+    populateTransactionData: async function (input) {
       try {
         var txResult = await this.grpc.getTransaction({
           hash: input,
           reversedHashOrder: true,
-          includeTokenMetadata: true
+          includeTokenMetadata: true,
         });
         this.transaction = input;
         var tx = txResult.getTransaction();
@@ -325,12 +388,21 @@ export default {
         this.transactionData["inputs"] = tx.getInputsList();
         this.transactionData["outputs"] = tx.getOutputsList();
         // set some slp properties
-        this.transactionData["slp_action"] = tx.getSlpTransactionInfo().getSlpAction();
-        this.transactionData["slp_action_str"] = this.mapSlpTransactionTypeString(this.transactionData["slp_action"]);
-        this.transactionData["slp_valid"] = tx.getSlpTransactionInfo().getValidityJudgement();
-        this.transactionData["slp_parse_error"] = tx.getSlpTransactionInfo().getParseError();
-        this.transactionData["burn_flags"] = this.mapBurnFlagToString(tx.getSlpTransactionInfo().getBurnFlagsList());
-        
+        this.transactionData["slp_action"] = tx
+          .getSlpTransactionInfo()
+          .getSlpAction();
+        this.transactionData["slp_action_str"] =
+          this.mapSlpTransactionTypeString(this.transactionData["slp_action"]);
+        this.transactionData["slp_valid"] = tx
+          .getSlpTransactionInfo()
+          .getValidityJudgement();
+        this.transactionData["slp_parse_error"] = tx
+          .getSlpTransactionInfo()
+          .getParseError();
+        this.transactionData["burn_flags"] = this.mapBurnFlagToString(
+          tx.getSlpTransactionInfo().getBurnFlagsList()
+        );
+
         const inputAmtMap = new Map();
         let outputAmt = Big(0);
         // loop through txn outputs set view data for slp tokens
@@ -340,7 +412,9 @@ export default {
             let tok = o.getSlpToken();
             if (tok) {
               o.token = {};
-              o.token.amount = Big(tok.getAmount()).div(10**tok.getDecimals());
+              o.token.amount = Big(tok.getAmount()).div(
+                10 ** tok.getDecimals()
+              );
               outputAmt = outputAmt.add(o.token.amount);
               o.token.isMintBaton = tok.getIsMintBaton();
               o.token.decimals = tok.getDecimals();
@@ -352,7 +426,7 @@ export default {
         if (this.transactionData["slp_valid"]) {
           const tm = txResult.getTokenMetadata();
           const _id = Buffer.from(tm.getTokenId_asU8()).toString("hex");
-          const _tmObj = { token_id: _id, name: "", ticker: ""};
+          const _tmObj = { token_id: _id, name: "", ticker: "" };
           _tmObj.token_type = tm.getTokenType();
           if (tm.hasV1Fungible()) {
             _tmObj.name = tm.getV1Fungible().getTokenName();
@@ -363,7 +437,9 @@ export default {
           } else if (tm.hasV1Nft1Child()) {
             _tmObj.name = tm.getV1Nft1Child().getTokenName();
             _tmObj.ticker = tm.getV1Nft1Child().getTokenTicker();
-            _tmObj.nft_group_id = Buffer.from(tm.getV1Nft1Child().getGroupId()).toString("hex");
+            _tmObj.nft_group_id = Buffer.from(
+              tm.getV1Nft1Child().getGroupId()
+            ).toString("hex");
           }
           if (_tmObj.name === "") {
             _tmObj.name = "NA";
@@ -381,14 +457,21 @@ export default {
             let tok = i.getSlpToken();
             if (tok) {
               i.token = {};
-              i.token.amount = Big(tok.getAmount()).div(10**tok.getDecimals());
+              i.token.amount = Big(tok.getAmount()).div(
+                10 ** tok.getDecimals()
+              );
               i.token.isMintBaton = tok.getIsMintBaton();
               i.token.decimals = tok.getDecimals();
-              i.token.token_id = Buffer.from(tok.getTokenId_asU8()).toString("hex");
+              i.token.token_id = Buffer.from(tok.getTokenId_asU8()).toString(
+                "hex"
+              );
               i.token.slp_action = tok.getSlpAction();
               i.token.token_type = tok.getTokenType();
               if (dat.token_metadata) {
-                if (i.token.token_id !== dat.token_metadata.token_id || i.token.token_type !== dat.token_metadata.token_type) {
+                if (
+                  i.token.token_id !== dat.token_metadata.token_id ||
+                  i.token.token_type !== dat.token_metadata.token_type
+                ) {
                   i.token.isBurned = true;
                   i.token.ticker = "";
                 } else {
@@ -396,14 +479,25 @@ export default {
                 }
               }
               // enumerate inputs for displaying burn quantity
-              if (! inputAmtMap.has(i.token.token_id + i.token.token_type)) {
-                inputAmtMap.set(i.token.token_id + i.token.token_type, i.token.amount);
+              if (!inputAmtMap.has(i.token.token_id + i.token.token_type)) {
+                inputAmtMap.set(
+                  i.token.token_id + i.token.token_type,
+                  i.token.amount
+                );
               } else {
-                let totalAmt = inputAmtMap.get(i.token.token_id + i.token.token_type);
+                let totalAmt = inputAmtMap.get(
+                  i.token.token_id + i.token.token_type
+                );
                 totalAmt = totalAmt.add(i.token.amount);
-                inputAmtMap.set(i.token.token_id + i.token.token_type, totalAmt);
+                inputAmtMap.set(
+                  i.token.token_id + i.token.token_type,
+                  totalAmt
+                );
               }
-              if (dat.burn_flags.includes("BURNED_INPUTS_OUTPUTS_TOO_HIGH") || dat.burn_flags.includes("BURNED_INPUTS_BAD_OPRETURN")) {
+              if (
+                dat.burn_flags.includes("BURNED_INPUTS_OUTPUTS_TOO_HIGH") ||
+                dat.burn_flags.includes("BURNED_INPUTS_BAD_OPRETURN")
+              ) {
                 i.token.isBurned = true;
                 i.token.ticker = "";
               }
@@ -413,7 +507,10 @@ export default {
         // set burned amount to display
         if (dat.token_metadata) {
           for (const amt of inputAmtMap) {
-            if (amt[0] === dat.token_metadata.token_id + dat.token_metadata.token_type) {
+            if (
+              amt[0] ===
+              dat.token_metadata.token_id + dat.token_metadata.token_type
+            ) {
               amt[1] = amt[1].sub(outputAmt);
               if (amt[1].gt(0)) {
                 dat.burn_amt_this_token = amt[1].toFixed();
@@ -430,7 +527,7 @@ export default {
         return false;
       }
     },
-    resetState: function() {
+    resetState: function () {
       this.result = "";
       this.address = "";
       this.addressData = this.defaultAddressData();
@@ -439,7 +536,7 @@ export default {
       this.transaction = "";
       this.transactionData = this.defaultTransactionData();
     },
-    defaultAddressData: function() {
+    defaultAddressData: function () {
       return {
         balance: 0,
         satoshis: 0,
@@ -451,7 +548,7 @@ export default {
         tokens: [],
       };
     },
-    defaultBlockData: function() {
+    defaultBlockData: function () {
       return {
         height: 0,
         version: 0,
@@ -464,10 +561,10 @@ export default {
         difficulty: 0,
         next_block_hash: "",
         size: 0,
-        median_time: 0
+        median_time: 0,
       };
     },
-    defaultTransactionData: function() {
+    defaultTransactionData: function () {
       return {
         version: 0,
         lock_time: 0,
@@ -482,10 +579,10 @@ export default {
         slp_action: 0,
         slp_action_str: "",
         slp_valid: false,
-        slp_parse_error: ""
+        slp_parse_error: "",
       };
     },
-    updateNetwork: function() {
+    updateNetwork: function () {
       this.resetState();
       this.infoResult = "Not connected (select another server)";
       this.grpc = null;
@@ -498,13 +595,13 @@ export default {
         this.searchBCHD(input);
       }
     },
-    newGrpcClient: function() {
+    newGrpcClient: function () {
       return new GrpcClient({
         url: this.selectedNetwork,
-        testnet: false
+        testnet: false,
       });
     },
-    getInfo: async function() {
+    getInfo: async function () {
       try {
         var blockInfo = await this.grpc.getBlockchainInfo();
         var blockHash = this.convertHash(blockInfo.getBestBlockHash());
@@ -515,14 +612,14 @@ export default {
         // Don't update, could be transient failures.
       }
     },
-    convertHash: function(bytes) {
-      return Array.from(bytes, function(byte) {
+    convertHash: function (bytes) {
+      return Array.from(bytes, function (byte) {
         return ("0" + (byte & 0xff).toString(16)).slice(-2);
       })
         .reverse()
         .join("");
     },
-    mapSlpTransactionTypeString: function(type) {
+    mapSlpTransactionTypeString: function (type) {
       switch (type) {
         case 0:
           return "NON_SLP";
@@ -552,10 +649,10 @@ export default {
           return "unknown type";
       }
     },
-    mapBurnFlagToString: function(flags) {
+    mapBurnFlagToString: function (flags) {
       let flagStr = "";
       flags.forEach((f) => {
-        switch(f) {
+        switch (f) {
           case 0:
             flagStr = flagStr + "BURNED_INPUTS_OUTPUTS_TOO_HIGH\n";
             break;
@@ -572,20 +669,20 @@ export default {
             flagStr = flagStr + "BURNED_INPUTS_GREATER_THAN_OUTPUTS\n";
             break;
           default:
-            flagStr = flagStr + "unknown burn type\n"
+            flagStr = flagStr + "unknown burn type\n";
         }
       });
       return flagStr;
     },
   },
-  created: function() {
+  created: function () {
     if (this.getInfoBar) {
       this.getInfo();
       setInterval(() => {
         this.getInfo();
-      }, 5000);
+      }, 60000);
     }
-  }
+  },
 };
 </script>
 
