@@ -98,7 +98,7 @@ export default {
       result: "",
       infoResult: " ",
       input: "",
-      grpc: this.newGrpcClient(),
+      grpc: null,
       testnet: false,
       address: "",
       addressData: this.defaultAddressData(),
@@ -153,13 +153,7 @@ export default {
     };
   },
   mounted() {
-    this.testnet = this.$route.params.network === TESTNET3;
     this.updateNetwork();
-  },
-  watch: {
-    $route(to) {
-      this.testnet = to.params.network === TESTNET3;
-    },
   },
   methods: {
     debug(val) {
@@ -170,6 +164,7 @@ export default {
     },
     searchBCHD: async function (input) {
       this.resetState();
+
       if (input == "") {
         this.$router.push({ name: "home" }).catch(() => {});
         return;
@@ -535,6 +530,7 @@ export default {
       this.blockData = this.defaultBlockData();
       this.transaction = "";
       this.transactionData = this.defaultTransactionData();
+      this.testnet = this.selectedNetwork.includes("testnet") || this.selectedNetwork.includes("18335")
     },
     defaultAddressData: function () {
       return {
@@ -588,7 +584,6 @@ export default {
       this.grpc = null;
       this.grpc = this.newGrpcClient();
       this.getInfo();
-      this.testnet = this.$route.params.network === TESTNET3;
       const params = this.$route.params;
       const input = params.address || params.blockHash || params.txId;
       if (input != undefined) {
