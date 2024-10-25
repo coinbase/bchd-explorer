@@ -18,7 +18,7 @@
     "jest": "^25.5.4",
     "pretty-bytes": "^5.4.1",
     "satoshi-bitcoin": "^1.0.4",
-    "vue": "^2.6.11",
+    "vue": "^3.0.0",
     "vue-router": "^3.4.3"
   },
   "devDependencies": {
