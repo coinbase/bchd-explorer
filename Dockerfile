@@ -13,15 +13,22 @@
 # limitations under the License.
 
 # build stage
-FROM node:lts-alpine as build-stage
+# The Node version is pinned explicitly: this stack (Vue CLI 4 / webpack 4)
+# predates the OpenSSL 3 hash changes in Node 17+ and must stay on Node 16.
+# A specific version tag also keeps builds reproducible instead of tracking a
+# mutable floating tag such as lts-alpine.
+FROM node:16.20.2-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+# npm ci installs exactly the versions pinned in package-lock.json.
+RUN npm ci
 COPY . .
 RUN npm run build
 
 # production stage
-FROM nginx:stable-alpine as production-stage
+# Pinned to a concrete nginx release instead of the drifting stable-alpine tag
+# so that image rebuilds do not silently pick up new upstream releases.
+FROM nginx:1.24-alpine as production-stage
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d

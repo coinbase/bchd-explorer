@@ -102,7 +102,7 @@
       class="table is-bordered is-striped"
       align="center"
       v-for="item in transactionData['inputs']"
-      v-bind:key="item.id"
+      v-bind:key="item.getIndex()"
     >
       <tbody>
         <tr>
@@ -154,7 +154,7 @@
       class="table is-bordered is-striped"
       align="center"
       v-for="item in transactionData['outputs']"
-      v-bind:key="item.id"
+      v-bind:key="item.getIndex()"
     >
       <tbody>
         <tr>

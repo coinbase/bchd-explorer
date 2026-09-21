@@ -87,7 +87,6 @@ export default {
       result: "",
       infoResult: " ",
       input: "",
-      grpc: this.newGrpcClient(),
       testnet: false,
       address: "",
       addressData: this.defaultAddressData(),
@@ -111,22 +110,19 @@ export default {
   },
   mounted() {
     this.testnet = this.$route.params.network === TESTNET3;
+    // updateNetwork() already performs the route-param-driven search, so no
+    // second explicit searchBCHD() call is needed here; duplicating it caused
+    // two full gRPC fetch sequences on every initial page load.
     this.updateNetwork();
-    const params = this.$route.params;
-    const input = params.address || params.blockHash || params.txId;
-    if (input != undefined) {
-      this.searchBCHD(input);
-    }
   },
   watch: {
     $route(to) {
       this.testnet = to.params.network === TESTNET3;
+      // updateNetwork() already performs the route-param-driven search, so
+      // duplicating it here fired two full gRPC fetch sequences for every
+      // navigation (including the route push that follows each search).
       this.updateNetwork();
       this.input = "";
-      const input = to.params.address || to.params.blockHash || to.params.txId;
-      if (input != undefined) {
-        this.searchBCHD(input);
-      }
     }
   },
   methods: {
@@ -250,7 +246,15 @@ export default {
             } else {
               _tokens.set(tokenID, {
                 token_id: tokenID,
-                token_metadata: tokenMetadata.get(tokenID),
+                // Fall back to placeholder metadata when the node did not
+                // return metadata for this token; downstream views (SLPAddress)
+                // dereference token_metadata unconditionally, so an undefined
+                // value here would crash the whole address render.
+                token_metadata: tokenMetadata.get(tokenID) || {
+                  token_id: tokenID,
+                  name: "NA",
+                  ticker: "tokens"
+                },
                 decimals: tok.getDecimals(),
                 balance: Big(tok.getAmount())
               });
@@ -263,10 +267,14 @@ export default {
       }
     },
     populateBlockData: async function(input) {
-      var blockFinder = "hash";
-      if (input >= 0 && input < 10000000) {
-        blockFinder = "height";
-      }
+      // A block height must be a plain decimal integer below ten million.
+      // Testing the string form with a digit-only pattern avoids JavaScript's
+      // loose string-to-number coercion, which could otherwise misclassify a
+      // rare all-digit block hash (e.g. "000000000009999999") as a height.
+      const blockFinder =
+        /^\d+$/.test(input) && Number(input) >= 0 && Number(input) < 10000000
+          ? "height"
+          : "hash";
       try {
         var blockResult = "";
         if (blockFinder === "height") {
@@ -512,7 +520,10 @@ export default {
         this.infoResult =
           "Height: " + blockHeight + " Block Hash: " + blockHash;
       } catch (error) {
-        // Don't update, could be transient failures.
+        // Transient node failures are common, so the last known values stay on
+        // screen; the failure is still surfaced in the console for diagnosis
+        // instead of being swallowed silently.
+        console.warn("getInfo: failed to fetch blockchain info:", error);
       }
     },
     convertHash: function(bytes) {
@@ -579,11 +590,26 @@ export default {
     },
   },
   created: function() {
+    // The gRPC client is created here rather than in data() so that Vue's
+    // reactivity system never walks its internal protobuf/HTTP state, and so
+    // it is constructed with selectedNetwork already initialized (data() ran
+    // newGrpcClient() before selectedNetwork existed, producing a client with
+    // an undefined URL that was immediately discarded).
+    this.grpc = this.newGrpcClient();
     if (this.getInfoBar) {
       this.getInfo();
-      setInterval(() => {
+      this.infoInterval = setInterval(() => {
         this.getInfo();
       }, 5000);
+    }
+  },
+  beforeDestroy: function() {
+    // Stop the polling timer when the component is destroyed so the interval
+    // no longer fires and no longer pins this component (and its gRPC client)
+    // in memory.
+    if (this.infoInterval) {
+      clearInterval(this.infoInterval);
+      this.infoInterval = null;
     }
   }
 };
